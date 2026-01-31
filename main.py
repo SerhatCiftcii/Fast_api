@@ -1,6 +1,8 @@
 
+import uvicorn
 from typing import Optional
 from fastapi import FastAPI
+from pydantic import BaseModel
 # ilk string alanı yaz unut olarak alır sonrada id yaz blog/str  sonra blog/id yoksa blog/id eziyor strigi,,
 #pydantic ile validasyon yapabiliriz. ve tip belirtebiliriz. ve fastapi otomatik olarak tip dönüşümü yapar.
 app = FastAPI()
@@ -33,4 +35,18 @@ def show(id:int):
 def comments(id,limit=10):
     #fetch comments of blog with id =id
     # return limit
+    
     return {"data":{"1","2"}}
+
+class Blog(BaseModel):
+    title: str
+    body: str
+    published: Optional[bool]
+@app.post("/blog")
+def create_blog(request: Blog):
+    return {"data":f"blog is with title as {request.title}"}
+    
+    #hata ayıklama amacıyla yapılan birşey bu unutma iyice öğren!!!
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="127.0.0.1", port=9000)
