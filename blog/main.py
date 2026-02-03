@@ -1,14 +1,17 @@
 from fastapi import FastAPI ,Depends, status , Response ,HTTPException
 
 from .import schemas
-from . import schemas, models
+from . import schemas, models 
 from .database import engine ,SessionLocal
 from sqlalchemy.orm import Session
+from .hashing import Hash
+
 
 
 
 app=FastAPI()
-models.Base.metadata.create_all(engine)
+models.Base.metadata.create_all(engine)# tabloları oluşturur otomatik migrations yapıyor
+
 def get_db():
     db= SessionLocal()
     try:
@@ -50,12 +53,12 @@ def update(id,request:schemas.Blog, db : Session = Depends(get_db)):
     db.commit()
     return 'updated'
 
-@app.get("/blog")
+@app.get("/blog",response_model=list[schemas.ShowBlog])
 def all(db : Session = Depends(get_db)):
     blogs = db.query(models.Blog).all()
     return blogs
 
-@app.get("/blog/{id}", status_code=status.HTTP_200_OK)
+@app.get("/blog/{id}", status_code=status.HTTP_200_OK, response_model=schemas.ShowBlog)
 def show(id: int, response:Response,   db : Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
     if not blog:
@@ -64,3 +67,20 @@ def show(id: int, response:Response,   db : Session = Depends(get_db)):
         # alternatif exceptıonlu olanı
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f" kayıtlı {id}'li blog id bulunamadı")
     return blog
+
+#response_model burda ne döndüreceğimizi belirtiyoruz
+@app.post('/user', response_model=schemas.ShowUser, status_code=status.HTTP_201_CREATED)
+def create_user(request:schemas.User, db: Session = Depends(get_db)):
+   
+    new_user=models.User(name=request.name, email=request.email, password=Hash.bcrypt(request.password))
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+@app.get('/user/{id}',response_model=schemas.ShowUser, status_code=status.HTTP_200_OK)
+def show_user(id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f" kayıtlı {id}'li kullanıcı bulunamadı")
+    return user
