@@ -39,4 +39,19 @@ class ShowUserWithBlogs(BaseModel):
     blogs:list[BlogSimple]
     model_config = ConfigDict(from_attributes=True)
 
+class Login(BaseModel):
+    username: str
+    password: str
+
+
+# tokenları döndermek için şema oluşturalım 
+# modelde tanımalnır mı? tokenlar veritabanında tutulmaz genelde sadece döndürülürler o yüzden şemada tanımlamak daha mantıklı
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    email: str | None = None
+
 

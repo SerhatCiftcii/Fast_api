@@ -6,14 +6,17 @@ from . import schemas, models
 from .database import engine, get_db # databsaete taşıdık
 from sqlalchemy.orm import Session
 from .hashing import Hash
-from .routers import blog, user
+from .routers import blog, user, authentication 
 
 
 
 app=FastAPI()
 models.Base.metadata.create_all(engine)# tabloları oluşturur otomatik migrations yapıyor
+app.include_router(authentication.router)
 app.include_router(blog.router)
 app.include_router(user.router)
+
+
 
 #databsaete taşııdık 
 # def get_db():

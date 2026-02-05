@@ -1,15 +1,16 @@
 from typing import List
 from fastapi import APIRouter, Depends, status, Response, HTTPException
-from .. import schemas ,database,models# .. nokta ile üst dizine çıkıyoruz
+from .. import schemas ,database,models, oauth2# .. nokta ile üst dizine çıkıyoruz
 from sqlalchemy.orm import Session
 from ..repository import blog  as blog_repository
+
 router = APIRouter(
 prefix="/blog",
 tags=["blogs"]
 )
 
 @router.get("/",response_model=list[schemas.ShowBlog])
-def all(db : Session = Depends(database.get_db)):
+def all(db : Session = Depends(database.get_db), current_user: schemas.User = Depends(oauth2.get_current_user)):
     #bu kısmı repositorye taşıyoruz!!!!!!!!!!!!!!!!!!
     # blogs = db.query(models.Blog).all()
     # return blogs
