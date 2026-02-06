@@ -1,9 +1,8 @@
 
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from blog.hashing import Hash
 from ..repository import user as user_repository
-from .. import database, models, schemas
+from .. import database, schemas
 
 router = APIRouter(
     prefix="/user",

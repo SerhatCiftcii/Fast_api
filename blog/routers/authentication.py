@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from ..hashing import Hash
 
-from .. import schemas, database, models, security
+from .. import schemas, database, models, token
 from sqlalchemy.orm import Session
 
 
@@ -21,6 +21,6 @@ def login(request:OAuth2PasswordRequestForm = Depends(), db: Session = Depends(d
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"parola yanlış")
     #genreate a jwt token and return
    
-    access_token = security.create_access_token(data={"sub": user.email} )
+    access_token = token.create_access_token(data={"sub": user.email} )
     return {"access_token": access_token, "token_type": "bearer"}
  
